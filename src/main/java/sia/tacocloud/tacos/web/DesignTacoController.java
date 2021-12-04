@@ -1,12 +1,9 @@
 package sia.tacocloud.tacos.web;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
@@ -21,41 +18,27 @@ import sia.tacocloud.tacos.Ingredient;
 import sia.tacocloud.tacos.Ingredient.Type;
 import sia.tacocloud.tacos.Taco;
 import sia.tacocloud.tacos.data.IngredientRepository;
-import sia.tacocloud.tacos.data.JdbcIngredientRepository;
+import sia.tacocloud.tacos.data.TacoRepository;
 
 import javax.validation.Valid;
 
 @Slf4j
 @Controller
 @RequestMapping("/design")
-@SessionAttributes("tacoOrder")
+@SessionAttributes("order")
 public class DesignTacoController {
 
     private final IngredientRepository ingredientRepo;
+
     @Autowired
     public DesignTacoController(
-            IngredientRepository ingredientRepo) {
+            IngredientRepository ingredientRepo,
+            TacoRepository tacoRepo) {
         this.ingredientRepo = ingredientRepo;
     }
 
     @ModelAttribute
     public void addIngredientsToModel(Model model) {
-
-//        List<Ingredient> ingredients = Arrays.asList(
-//                new Ingredient("FLTO", "Flour Tortilla", Type.WRAP),
-//                new Ingredient("COTO", "Corn Tortilla", Type.WRAP),
-//                new Ingredient("GRBF", "Ground Beef", Type.PROTEIN),
-//                new Ingredient("CARN", "Carnitas", Type.PROTEIN),
-//                new Ingredient("TMTO", "Diced Tomatoes", Type.VEGGIES),
-//                new Ingredient("LETC", "Lettuce", Type.VEGGIES),
-//                new Ingredient("CHED", "Cheddar", Type.CHEESE),
-//                new Ingredient("JACK", "Monterrey Jack", Type.CHEESE),
-//                new Ingredient("SLSA", "Salsa", Type.SAUCE),
-//                new Ingredient("SRCR", "Sour Cream", Type.SAUCE)
-//        );
-
-
-
         List<Ingredient> ingredients = (List<Ingredient>) ingredientRepo.findAll();
 
         Type[] types = Ingredient.Type.values();
@@ -67,18 +50,18 @@ public class DesignTacoController {
 
     @GetMapping
     public String showDesignForm(Model model) {
-        model.addAttribute("taco", new Taco());
+        model.addAttribute("order", new Taco());
         return "design";
     }
 
     @PostMapping
-    public String processTaco(@Valid @ModelAttribute("taco") Taco taco, Errors errors){
+    public String processTaco(@Valid @ModelAttribute("order") Taco taco, Errors errors){
         if(errors.hasErrors()){
             return "design";
         }
+        log.info("prcoessing Taco: " + taco);
+//        tacoRepo.save(taco);
 
-//        These needs implementation
-        log.info("prcoessing Taco" + taco);
         return "redirect:/orders/current";
     }
 

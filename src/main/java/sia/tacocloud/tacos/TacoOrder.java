@@ -19,9 +19,9 @@ public class TacoOrder implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Date placedAt;
+    private Date placedAt = new Date();
 
     @NotBlank(message = "Delivery Name is required")
     private String deliveryName;
@@ -46,6 +46,7 @@ public class TacoOrder implements Serializable {
     private String ccExpiration;
 
     @Digits(integer=3, fraction=0, message="Invalid CVV")
+    @Column(name = "cc_cvv")
     private String ccCVV;
 
     @OneToMany(cascade = CascadeType.ALL)

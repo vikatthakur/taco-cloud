@@ -9,7 +9,9 @@ import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
+import sia.tacocloud.tacos.Taco;
 import sia.tacocloud.tacos.TacoOrder;
 import sia.tacocloud.tacos.data.OrderRepository;
 
@@ -28,7 +30,10 @@ public class OrderController {
 
     @GetMapping("/current")
     public String orderForm(Model model){
-        model.addAttribute("tacoOrder", new TacoOrder());
+        if(!model.containsAttribute("order")) {
+            log.info("model attribute order is not present");
+            model.addAttribute("order", new TacoOrder());
+        }
         return "orderForm";
     }
 
