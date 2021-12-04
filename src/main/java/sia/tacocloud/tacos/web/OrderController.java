@@ -20,6 +20,7 @@ import javax.validation.Valid;
 @Slf4j
 @Controller
 @RequestMapping("/orders")
+@SessionAttributes("tacoOrder")
 public class OrderController {
 
     private final OrderRepository orderRepository;
@@ -30,10 +31,6 @@ public class OrderController {
 
     @GetMapping("/current")
     public String orderForm(Model model){
-        if(!model.containsAttribute("order")) {
-            log.info("model attribute order is not present");
-            model.addAttribute("order", new TacoOrder());
-        }
         return "orderForm";
     }
 
@@ -42,8 +39,7 @@ public class OrderController {
         if(errors.hasErrors()){
             return "orderForm";
         }
-
-        log.info("Order submitted: " + order);
+        
         orderRepository.save(order);
         sessionStatus.setComplete();
 
