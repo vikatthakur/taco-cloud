@@ -39,7 +39,7 @@ public class OrderController {
         if(errors.hasErrors()){
             return "orderForm";
         }
-        
+
         orderRepository.save(order);
         sessionStatus.setComplete();
 
