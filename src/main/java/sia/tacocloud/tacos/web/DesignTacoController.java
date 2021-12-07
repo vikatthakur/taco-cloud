@@ -1,5 +1,6 @@
 package sia.tacocloud.tacos.web;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -18,8 +19,10 @@ import sia.tacocloud.tacos.Ingredient;
 import sia.tacocloud.tacos.Ingredient.Type;
 import sia.tacocloud.tacos.Taco;
 import sia.tacocloud.tacos.TacoOrder;
+import sia.tacocloud.tacos.User;
 import sia.tacocloud.tacos.data.IngredientRepository;
 import sia.tacocloud.tacos.data.TacoRepository;
+import sia.tacocloud.tacos.data.UserRepository;
 
 import javax.validation.Valid;
 
@@ -30,12 +33,17 @@ import javax.validation.Valid;
 public class DesignTacoController {
 
     private final IngredientRepository ingredientRepo;
+    private final TacoRepository tacoRepo;
+    private final UserRepository userRepo;
 
     @Autowired
     public DesignTacoController(
             IngredientRepository ingredientRepo,
-            TacoRepository tacoRepo) {
+            TacoRepository tacoRepo,
+            UserRepository userRepo) {
         this.ingredientRepo = ingredientRepo;
+        this.tacoRepo = tacoRepo;
+        this.userRepo = userRepo;
     }
 
     @ModelAttribute
@@ -56,8 +64,12 @@ public class DesignTacoController {
     }
 
     @GetMapping
-    public String showDesignForm(Model model) {
+    public String showDesignForm(Model model, Principal principal) {
         model.addAttribute("taco", new Taco());
+
+        String username = principal.getName();
+        User user = userRepo.findByUsername(username);
+        model.addAttribute("user", user);
         return "design";
     }
 
