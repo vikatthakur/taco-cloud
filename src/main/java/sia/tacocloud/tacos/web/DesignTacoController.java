@@ -2,17 +2,19 @@ package sia.tacocloud.tacos.web;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.hateoas.server.EntityLinks;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.SessionAttributes;
+import org.springframework.web.bind.annotation.*;
 
 import lombok.extern.slf4j.Slf4j;
 import sia.tacocloud.tacos.Ingredient;
@@ -23,12 +25,12 @@ import sia.tacocloud.tacos.User;
 import sia.tacocloud.tacos.data.IngredientRepository;
 import sia.tacocloud.tacos.data.TacoRepository;
 import sia.tacocloud.tacos.data.UserRepository;
-
 import javax.validation.Valid;
 
 @Slf4j
 @Controller
-@RequestMapping("/design")
+@RequestMapping(path = "/design", produces = "application/json")
+@CrossOrigin(origins = "*")
 @SessionAttributes("tacoOrder")
 public class DesignTacoController {
 
@@ -79,7 +81,7 @@ public class DesignTacoController {
             return "design";
         }
         order.addTaco(taco);
-
+        log.info("posting order");
         return "redirect:/orders/current";
     }
 
@@ -89,6 +91,32 @@ public class DesignTacoController {
                 .stream()
                 .filter(x -> x.getType().equals(type))
                 .collect(Collectors.toList());
+    }
+
+//    private TacoRepository repo;
+
+    @Autowired
+    EntityLinks entityLinks;
+
+//    public DesignTacoController(TacoRepository repo){
+//        this.repo = repo;
+//    }
+
+    @GetMapping("/recent")
+    @ResponseBody
+    public Iterable<Taco> recentTacos() {
+        PageRequest page = PageRequest.of(
+                0, 12, Sort.by("createdAt").descending());
+        return tacoRepo.findAll(page).getContent();
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Taco> tacoById(@PathVariable("id") Long id) {
+        Optional<Taco> optTaco = tacoRepo.findById(id);
+        if (optTaco.isPresent()) {
+            return new ResponseEntity<>(optTaco.get(), HttpStatus.OK);
+        }
+        return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
     }
 
 }
